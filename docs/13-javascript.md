@@ -57,23 +57,22 @@ page.at_css("input").execute("this.value = text", text: "hello")
 
 #### Upgrading to 0.21
 
-Scripts written for the old API run exactly as before, and Ferrum warns, pointing at your code, about any whose result
-changes in 0.21. `evaluate_async`, `evaluate_func` and `evaluate_on` are removed in 0.21. Set
-`FERRUM_DEPRECATION_WARNINGS=raise` to turn the warnings into errors while migrating, or `0` to silence them.
+0.21 finishes the move to the API above. Ferrum 0.20 runs old-style scripts as before and warns about each change below,
+pointing at your code, so upgrade to 0.20 first and fix its warnings.
 
-| Warning | Today | In 0.21 | Rewrite |
+| Script | 0.20 | 0.21 | Rewrite |
 |---|---|---|---|
 | Keyword arguments read through `arguments` | one object in `arguments[0]` | named parameters | `evaluate("options.foo", options: { foo: 1 })` |
 | Mixing positional and keyword arguments | keywords appended as an object | `ArgumentError` | pass the object in braces, or name every argument |
 | More than one expression, `"a(); b"` | returns `a()`, skips the rest | `SyntaxError` | `evaluate("function() { a(); return b }")` |
-| Never runs, a line break before the script | `nil`, nothing runs | runs and returns its value | check it's safe to run, or remove it |
+| A line break before the script | `nil`, nothing runs | runs and returns its value | check it's safe to run, or remove it |
 | Returns a promise | `{}`, not awaited | awaited, raises if rejected | prefix with `void` to keep it from waiting |
 | Returns an object with a `then` method | the object | awaited like a promise | wrap it, `({ value: object })` |
 | Throws something that isn't an `Error` | the thrown value | `Ferrum::JavaScriptError` | return the value instead |
 | `Node#evaluate` returns a node, nodes or a `Date` | `{}` | `Ferrum::Node`, or the date's string | check the code using the result |
-| `evaluate_async(expression, wait, *args)` | | removed | `evaluate("await …", timeout: wait)` |
-| `evaluate_func(function, *args, on:)` | | removed | `evaluate(function, a: 1)`, or `node.evaluate(function)` |
-| `evaluate_on(node:, expression:)` | | removed | `node.evaluate(expression)` |
+| `evaluate_async(expression, wait, *args)` | deprecated | removed | `evaluate("await …", timeout: wait)` |
+| `evaluate_func(function, *args, on:)` | deprecated | removed | `evaluate(function, a: 1)`, or `node.evaluate(function)` |
+| `evaluate_on(node:, expression:)` | deprecated | removed | `node.evaluate(expression)` |
 
 #### evaluate_on_new_document(source, \*\*options) : `String`
 
